@@ -87,12 +87,14 @@ def score_planets(planet1, planet2, verbose=False):
     return (result**3)/10
 
 def score_opposition(planet1, planet2, offset):
-    score = score_planets(planet1, planet2) - 2
-    return score * (2/math.exp(offset))
+    '''Return a float, the higher it is the more of a harbinger of doom it is.'''
+    score = -score_planets(planet1, planet2)
+    return score * (5/math.exp(offset)) + 1
 
 def score_conjunction(planet1, planet2, offset):
-    score = score_planets(planet1, planet2) + 2
-    return score * (1/math.exp(offset))
+    '''Return a float, the higher it is the more of a harbinger of doom it is.'''
+    score = score_planets(planet1, planet2)
+    return score * (5/math.exp(offset))
 
 planets = {
     'ceres': {'element': 'earth', 'modality': 'mutable', 'trait':'physical', 'lacks':'mental', 'quickness': 0},
@@ -199,7 +201,7 @@ def make_printable(planet):
 
 def get_astrology_score(cast_time=None):
     '''Get a score for the given time, with all contributing factors (conjunctions & oppotisions) involved. Negative scores are bad.'''
-    from astrologic import now_cast, signs, symbols
+    from astrology import now_cast, signs, symbols
     cast = now_cast(cast_time=cast_time, to_console=False, diff=5)
     result = []
     for planet1,planet2,offset in cast['aspects']['conjunction']:
@@ -239,3 +241,39 @@ def plot_score():
     ts = Series(ts)
     ts.plot()
     plt.show()
+
+def plot_percentage():
+    import matplotlib.pyplot as plt
+    from pandas import Series
+    ts = {}
+
+    for day in range(1, 30):
+        for hour in range(0, 24, 1):
+#        for minute in range(0, 60):
+            cast_time = datetime(2016, 11, day, hour)
+            scores = get_astrology_score(cast_time)
+            '''
+            total = 0
+            for reason,score in scores:
+                total += score
+            chance_of_doom = int(100/(1+math.exp(-total)))
+            '''
+            scoreMax = max(scores, key=lambda x: x[1])
+            scoreMin = min(scores, key=lambda x: x[1])
+            if abs(scoreMin[1]) > abs(scoreMax[1]):
+                score = scoreMin
+            else:
+                score = scoreMax
+            chance_of_doom = int(100/(1+math.exp(-score[1])))
+
+            scores = sorted(scores, key=lambda x: x[1])
+
+            print(str(cast_time).ljust(20), str(round(score[1],3)).ljust(10), chance_of_doom, scores[0])
+            ts[cast_time] = chance_of_doom
+
+    ts = Series(ts)
+    ts.plot()
+    plt.show()
+
+if __name__ == "__main__":
+    plot_percentage()
