@@ -22,6 +22,7 @@ One d8 for young/old: [1] --> old yin
 import random
 import pandas
 from pandas import DataFrame
+import os
 
 fuHsiOrdering = ['111111',
  '000000',
@@ -120,8 +121,8 @@ def lookUpHexagram(lines):
         else:
             binString += '1'
 
-    #kingWenNumber = fuHsiOrdering.index(binString)
-    df = pandas.read_csv('iching_lookup.tsv', sep='\t', header=0, dtype={'binary':object})
+    abspath = os.path.abspath(os.path.dirname(__file__))
+    df = pandas.read_csv(abspath+'/iching_lookup.tsv', sep='\t', header=0, dtype={'binary':object})
     hexagram = df[df['binary']==binString]
     if len(hexagram) != 1:
         raise Exception('Wrong number of hexagrams for {}\nDataframe:\n{}'.format(binString, hexagram))
