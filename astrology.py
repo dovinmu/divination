@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 import pytz
-from ephem import *
+# from ephem import *
 import ephem
 
 symbols = {
@@ -145,24 +145,24 @@ class colors:
 
 def Ceres():
     readable = 'Ceres, e, 10.607, 80.702, 71.274, 2.7685, 0.21396, 0.0780, 287.265, 10/1/1989, 2000.0, 3.32, 0.11'
-    return readdb(readable.replace(' ',''))
+    return ephem.readdb(readable.replace(' ',''))
 def Pallas():
-    return readdb('Pallas,e,34.804,173.323,309.796,2.7703,0.21375,0.2347,273.779,10/1/1989,2000.0,4.13,0.15')
+    return ephem.readdb('Pallas,e,34.804,173.323,309.796,2.7703,0.21375,0.2347,273.779,10/1/1989,2000.0,4.13,0.15')
 def Juno():
-    return readdb('Juno,e,12.991,170.542,246.787,2.6692,0.22601,0.2575,205.808,11/5/1990,2000.0,5.31,0.30')
+    return ephem.readdb('Juno,e,12.991,170.542,246.787,2.6692,0.22601,0.2575,205.808,11/5/1990,2000.0,5.31,0.30')
 def Vesta():
-    return readdb('Vesta,e,7.139,104.015,149.986,2.3607,0.27174,0.0906,152.190,11/5/1990,2000.0,3.16,0.34')
+    return ephem.readdb('Vesta,e,7.139,104.015,149.986,2.3607,0.27174,0.0906,152.190,11/5/1990,2000.0,3.16,0.34')
 def Hygiea():
-    return readdb('Hygiea,e,3.840,283.833,315.832,3.1365,0.17743,0.1202,104.089,11/5/1990,2000.0,5.37,0.15')
+    return ephem.readdb('Hygiea,e,3.840,283.833,315.832,3.1365,0.17743,0.1202,104.089,11/5/1990,2000.0,5.37,0.15')
 def Eris():
     #warning: hand-compiled
     readable = 'Eris, e, 44.176, 35.890, 151.315, 67.662, 0.00177, 0.442, 204.63, 6/31/2016, 2007.0, -1.2, 0.6'
-    return readdb(readable.replace(' ',''))
+    return ephem.readdb(readable.replace(' ',''))
 
 def Chiron():
     #warning: hand-compiled
     readable = 'Chiron, e, 6.932, 208.65, 339.58, 13.7, 0.2, 0.3832, 359.5, 17/31/1996, 2000.0, 3.32, 0.11'
-    return readdb(readable.replace(' ',''))
+    return ephem.readdb(readable.replace(' ',''))
 
 ecliptic_traditional = ('aries','taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces')
 
@@ -197,16 +197,16 @@ def animate_moon():
 
 def major_planetary_signs(birth):
     bodies = (
-        ('sun',Sun()),
-        ('moon',Moon()),
-        ('mercury',Mercury()),
-        ('venus',Venus()),
-        ('mars',Mars()),
-        ('jupiter',Jupiter()),
-        ('saturn',Saturn()),
-        ('uranus',Uranus()),
-        ('neptune',Neptune()),
-        ('pluto',Pluto())
+        ('sun',ephem.Sun()),
+        ('moon',ephem.Moon()),
+        ('mercury',ephem.Mercury()),
+        ('venus',ephem.Venus()),
+        ('mars',ephem.Mars()),
+        ('jupiter',ephem.Jupiter()),
+        ('saturn',ephem.Saturn()),
+        ('uranus',ephem.Uranus()),
+        ('neptune',ephem.Neptune()),
+        ('pluto',ephem.Pluto())
     )
     return planetary_signs(birth, bodies)
 
@@ -226,7 +226,7 @@ def planetary_signs(birth, bodies):
     signs = []
     for name,body in bodies:
         body.compute(birth)
-        degrees,minutes,seconds = str(Ecliptic(body).lon).split(':')
+        degrees,minutes,seconds = str(ephem.Ecliptic(body).lon).split(':')
         degrees = int(degrees) + int(minutes)/60 + float(seconds)/(60*60)
         #print(name, Ecliptic(body).lon, degrees)
         signs.append((name,get_sign(degrees),(degrees)))
@@ -234,16 +234,16 @@ def planetary_signs(birth, bodies):
 
 def planetary_constellations(birth):
     bodies = (
-        ('sun',Sun()),
-        ('moon',Moon()),
-        ('mercury',Mercury()),
-        ('venus',Venus()),
-        ('mars',Mars()),
-        ('jupiter',Jupiter()),
-        ('saturn',Saturn()),
-        ('uranus',Uranus()),
-        ('neptune',Neptune()),
-        ('pluto',Pluto()),
+        ('sun',ephem.Sun()),
+        ('moon',ephem.Moon()),
+        ('mercury',ephem.Mercury()),
+        ('venus',ephem.Venus()),
+        ('mars',ephem.Mars()),
+        ('jupiter',ephem.Jupiter()),
+        ('saturn',ephem.Saturn()),
+        ('uranus',ephem.Uranus()),
+        ('neptune',ephem.Neptune()),
+        ('pluto',ephem.Pluto()),
         ('ceres',Ceres()),
         ('pallas',Pallas()),
         ('vesta',Vesta()),
@@ -256,7 +256,7 @@ def planetary_constellations(birth):
     for name,body in bodies:
         body.compute(birth)
         #print(name.capitalize() + symbols['planets'][name] + ' :', constellation(body)[1])
-        constellations[name] = constellation(body)[1].lower()
+        constellations[name] = ephem.constellation(body)[1].lower()
     return constellations
 
 def abs_diff(a, b):
@@ -356,14 +356,14 @@ def lunarPhase(birth):
     'last quarter moon':'🌗',
     'balsamic moon':'🌘'
     '''
-    moon = Moon()
+    moon = ephem.Moon()
     moon.compute(birth)
     if moon.phase < 0.2:
         symbol = symbols['lunar phases']['new moon']
     elif moon.phase > 99.8:
         symbol = symbols['lunar phases']['full moon']
     else:
-        if next_full_moon(birth.date) > next_new_moon(birth.date):
+        if ephem.next_full_moon(birth.date) > ephem.next_new_moon(birth.date):
             #moon is waning
             if moon.phase < 33:
                 symbol = symbols['lunar phases']['balsamic moon']
@@ -399,7 +399,7 @@ def now_cast(city_name=None, cast_time=None, timezone=None, to_console=True, dif
         if to_console:
             animate_moon()
             print('Global horoscope for {}\n'.format(cast_time))
-        birth = Observer()
+        birth = ephem.Observer()
         birth.date = ephem.Date(cast_time)
 
         planets = major_planetary_signs(birth)
