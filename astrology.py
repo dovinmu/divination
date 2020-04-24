@@ -289,24 +289,24 @@ def aspect_relationships(planets, diff=10):
 
 def ascendent(birth, tz):
     fixed = (
-        ('aries', FixedBody()),
-        ('taurus', FixedBody()),
-        ('gemini', FixedBody()),
-        ('cancer', FixedBody()),
-        ('leo', FixedBody()),
-        ('virgo', FixedBody()),
-        ('libra', FixedBody()),
-        ('scorpio', FixedBody()),
-        ('sagittarius', FixedBody()),
-        ('capricorn', FixedBody()),
-        ('aquarius', FixedBody()),
-        ('pisces', FixedBody())
+        ('aries', ephem.FixedBody()),
+        ('taurus', ephem.FixedBody()),
+        ('gemini', ephem.FixedBody()),
+        ('cancer', ephem.FixedBody()),
+        ('leo', ephem.FixedBody()),
+        ('virgo', ephem.FixedBody()),
+        ('libra', ephem.FixedBody()),
+        ('scorpio', ephem.FixedBody()),
+        ('sagittarius', ephem.FixedBody()),
+        ('capricorn', ephem.FixedBody()),
+        ('aquarius', ephem.FixedBody()),
+        ('pisces', ephem.FixedBody())
     )
     #create markers for the constellations at equally spaced ecliptic longitude
     for i in range(len(fixed)):
         sign = fixed[i][1]
-        ec = Ecliptic(degrees(str(i*30)), degrees('0'))
-        eq = Equatorial(ec)
+        ec = ephem.Ecliptic(ephem.degrees(str(i*30)), ephem.degrees('0'))
+        eq = ephem.Equatorial(ec)
         sign._ra, sign._dec = eq.ra, eq.dec
         sign.compute(birth)
     #find the most recently risen sign
@@ -444,7 +444,7 @@ def horoscope(name, birth, date, timezone):
     birth.date = ephem.Date(birth_utc)
 
     print('_' * 50 + '\n')
-    print('horoscope for {}:\nlat, lon: {}, {} \ndate and time (24hr): {}\n'.format(name, (birth.lat), (birth.lon), tz.localize(birth.date.datetime())))
+    print(f'horoscope for {name}:\nlat,lon: {birth.lat}, {birth.lon}\ndate and time (24hr): {tz.localize(birth.date.datetime()  )}\n')
 
     planets = major_planetary_signs(birth)
     planets.extend(minor_planetary_signs(birth))
