@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 import pytz
-# from ephem import *
 import ephem
 
 symbols = {
@@ -414,7 +413,7 @@ def now_cast(city_name=None, cast_time=None, timezone=None, to_console=True, dif
 
         #print out formatted string for each planet with sign and degrees
             template = '{0:10}:  {1:14} {2:5}° ({3:3}°)  {4:14}'
-            print('{0:10}   {1:14} {2:5}°  {3:3}°   {4:14} '.format('Planet','Sign','Rel.','Ab.', 'Constellation'))
+            print('{0:15}   {1:14} {2:5}°  {3:3}°   {4:14} '.format('Planet','Sign','Rel.','Ab.', 'Constellation'))
             print('\n'.join([template.format(symbolfy(planet), symbolfy(sign), int(deg)%30, int(deg), symbolfy(constellations[planet])) for planet,sign,deg in planets]))
 
             print('')
@@ -496,4 +495,49 @@ def horoscope(name, birth, date, timezone):
     print('_' * 50 + '\n')
 
 if __name__ == "__main__":
-    now_cast()
+    # now_cast()
+    selection = input('''
+Select an option:
+1: Horoscope
+2: Nowcast
+''')
+    if selection == '2':
+        now_cast()
+    if selection == '1':
+        name = input("What is this person's name? ")
+        datestring = input('''What day was this person born? (Please use the format YYYY-MM-DD) ''')
+        timestring = input('''What time? (Please use the format 24HH:MM) ''')
+        try:
+            dt = datetime(*[int(el) for el in datestring.split('-')], *[int(el) for el in timestring.split(':')])
+        except Exception as e:
+            print("Flagrant error :(", str(e))
+        city = input("What city were they born at or near? (If no city, just hit enter) ")
+        try:
+            birth_city = ephem.city(city)
+        except Exception as e:
+            if len(city) > 1:
+                print("Couldn't find city", city)
+            print("You'll have to enter latitude and longitude")
+            lat = input("Enter latitude: ")
+            lon = input("Enter longitude: ")
+            birth_city = Observer()
+            birth_city.lon = lon
+            birth_city.lat = lat
+        common_tzs = {
+            1: 'US/Eastern',
+            2: 'US/Pacific',
+            3: 'Europe/Berlin',
+            4: 'Europe/London',
+            5: 'US/Mountain',
+            6: 'US/Central'
+        }
+        common_tzs_stringified = "\n".join([f'{key}: {val}' for key,val in common_tzs.items()])
+        tz = input(f'''Were they born in one of these timezones? Type a number, or enter the correct timezone
+{common_tzs_stringified}
+''')
+        if tz not in pytz.all_timezones:
+            try:
+                tz = common_tzs[int(tz)]
+            except Exception as e:
+                print("You sure this timezone exists?", tz)
+        horoscope(name, birth_city, dt, tz)
