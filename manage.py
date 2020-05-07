@@ -2,6 +2,7 @@
 
 if __name__ == "__main__":
     import astrology
+    from ephem import city
     astrology.now_cast()
 
     test_birth = city('Washington')
