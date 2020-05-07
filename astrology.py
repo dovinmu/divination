@@ -520,7 +520,7 @@ Select an option:
             print("You'll have to enter latitude and longitude")
             lat = input("Enter latitude: ")
             lon = input("Enter longitude: ")
-            birth_city = Observer()
+            birth_city = ephem.Observer()
             birth_city.lon = lon
             birth_city.lat = lat
         common_tzs = {
