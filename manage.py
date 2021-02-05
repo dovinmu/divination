@@ -13,4 +13,5 @@ if __name__ == "__main__":
     birth_city = "Washington"
     birth_dt = datetime(1070, 1, 1, 1, 1)
     birth_tz = "US/Eastern"
-    horoscope = astrology.horoscope(name, birth_city, birth_dt, birth_tz)
+    horoscope = astrology.horoscope(name, birth_city, birth_dt, birth_tz, to_console=False)
+    print(horoscope)

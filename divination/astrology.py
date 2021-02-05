@@ -466,6 +466,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
     print('\nWARNING: ascendent computations could be off by as much as 3°\nASC:', asc[0].capitalize() + ' ' + symbols['constellations'][asc[0]] + ' ' + str(int(asc[1])%30) + '°' + ' (' + asc[1] + '°)')
 
     #divvy up houses
+    houses = []
     house_start = int(asc[1])
     for i in range(1,13):
         house = []
@@ -478,6 +479,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
                 house.append((planet,sign,int(deg)))
         house.sort(key=lambda x: x[2])
         print('House #{}: ({}) {}'.format(i, house_start, ' '.join(['{} {}°'.format(signedPlanet(planet, sign), (deg%30)) for planet,sign,deg in house])))
+        houses.append(house)
         house_start = house_end
 
     print('')
@@ -498,7 +500,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
     print('_' * 50 + '\n')
 
     if not to_console:
-        return { "houses": house, "planets": planets, "constellations": constellations }
+        return { "houses": houses, "planets": planets, "constellations": constellations }
 
 def printHoroscope(planets, constellations, houses, powers, aspects, ):
     animate_moon()
