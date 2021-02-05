@@ -500,7 +500,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
     print('_' * 50 + '\n')
 
     if not to_console:
-        return { "houses": houses, "planets": planets, "constellations": constellations }
+        return { "houses": houses, "planets": planets, "constellations": constellations, "moon": {"phase":lunarPhase(birth), "symbol": symbol_lookup[lunarPhase(birth)]} }
 
 def printHoroscope(planets, constellations, houses, powers, aspects, ):
     animate_moon()
