@@ -425,7 +425,6 @@ def now_cast(city_name=None, cast_time=None, timezone=None, to_console=True, dif
             print('')
             print('Lunar phase: {} ({})'.format(lunarPhase(birth), symbol_lookup[lunarPhase(birth)]))
 
-
             print('')
             print('_' * 50 + '\n')
     else:
@@ -435,9 +434,13 @@ def now_cast(city_name=None, cast_time=None, timezone=None, to_console=True, dif
     if not to_console:
         return {'planets':planets, 'constellations': constellations, 'aspects': aspects, 'phase': lunarPhase(birth), 'powers':power_relationships(planets)}
 
-def horoscope(name, birth, date, timezone):
-    animate_moon()
+def horoscope(name, birth, date, timezone, to_console=True):
+    if to_console:
+        animate_moon()
 
+    if type(birth) != ephem.Observer:
+        birth = ephem.city(birth)
+        
     tz = pytz.timezone(timezone)
     birth_utc = tz.localize(date).astimezone(pytz.utc)
     birth.date = ephem.Date(birth_utc)
@@ -475,6 +478,7 @@ def horoscope(name, birth, date, timezone):
                 house.append((planet,sign,int(deg)))
         house.sort(key=lambda x: x[2])
         print('House #{}: ({}) {}'.format(i, house_start, ' '.join(['{} {}°'.format(signedPlanet(planet, sign), (deg%30)) for planet,sign,deg in house])))
+        houses.append((i, house_start, planet, sign, deg))
         house_start = house_end
 
     print('')
@@ -493,6 +497,9 @@ def horoscope(name, birth, date, timezone):
 
     print('')
     print('_' * 50 + '\n')
+
+    if not to_console:
+        return { "houses": houses, "planets": planets, "constellations": constellations }
 
 def printHoroscope(planets, constellations, houses, powers, aspects, ):
     animate_moon()
