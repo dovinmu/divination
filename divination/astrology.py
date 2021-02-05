@@ -440,7 +440,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
 
     if type(birth) != ephem.Observer:
         birth = ephem.city(birth)
-        
+
     tz = pytz.timezone(timezone)
     birth_utc = tz.localize(date).astimezone(pytz.utc)
     birth.date = ephem.Date(birth_utc)
@@ -466,6 +466,7 @@ def horoscope(name, birth, date, timezone, to_console=True):
     print('\nWARNING: ascendent computations could be off by as much as 3°\nASC:', asc[0].capitalize() + ' ' + symbols['constellations'][asc[0]] + ' ' + str(int(asc[1])%30) + '°' + ' (' + asc[1] + '°)')
 
     #divvy up houses
+    houses = []
     house_start = int(asc[1])
     for i in range(1,13):
         house = []
