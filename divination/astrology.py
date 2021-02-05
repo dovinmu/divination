@@ -494,8 +494,67 @@ def horoscope(name, birth, date, timezone):
     print('')
     print('_' * 50 + '\n')
 
+def printHoroscope(planets, constellations, houses, powers, aspects, ):
+    animate_moon()
+
+    tz = pytz.timezone(timezone)
+    birth_utc = tz.localize(date).astimezone(pytz.utc)
+    birth.date = ephem.Date(birth_utc)
+
+    print('_' * 50 + '\n')
+    print(f'horoscope for {name}:\nlat,lon: {birth.lat}, {birth.lon}\ndate and time (24hr): {tz.localize(birth.date.datetime()  )}\n')
+
+    planets = major_planetary_signs(birth)
+    planets.extend(minor_planetary_signs(birth))
+    constellations = planetary_constellations(birth)
+
+    sun_sign = planets[0][1]
+    print('{}\n{} ({}, {})\n'.format(sun_sign.upper(), signs[sun_sign]['gloss'], signs[sun_sign]['element'], signs[sun_sign]['modality']))
+
+    #print out formatted string for each planet with sign and degrees
+    template = '{0:10}:  {1:14} {2:5}° ({3:3}°)  {4:14}'
+    print('{0:10}   {1:14} {2:5}°  {3:3}°   {4:14} '.format('Planet','Sign','Rel.','Ab.', 'Constellation'))
+    print('\n'.join([template.format(symbolfy(planet), symbolfy(sign), int(deg)%30, int(deg), symbolfy(constellations[planet])) for planet,sign,deg in planets]))
+
+    asc = ascendent(birth, tz)
+    #print(asc)
+
+    print('\nWARNING: ascendent computations could be off by as much as 3°\nASC:', asc[0].capitalize() + ' ' + symbols['constellations'][asc[0]] + ' ' + str(int(asc[1])%30) + '°' + ' (' + asc[1] + '°)')
+
+    #divvy up houses
+    house_start = int(asc[1])
+    for i in range(1,13):
+        house = []
+        house_end = (house_start + 30) % 360
+        for planet,sign,deg in planets:
+            if house_start < house_end:
+                if house_start <= int(deg) and int(deg) < house_end:
+                    house.append((planet,sign,int(deg)))
+            elif house_start <= int(deg) or int(deg) < house_end:
+                house.append((planet,sign,int(deg)))
+        house.sort(key=lambda x: x[2])
+        print('House #{}: ({}) {}'.format(i, house_start, ' '.join(['{} {}°'.format(signedPlanet(planet, sign), (deg%30)) for planet,sign,deg in house])))
+        house_start = house_end
+
+    print('')
+    powers = power_relationships(planets)
+    for power in ['dignity', 'detriment', 'exaltation', 'fall']:
+        if len(powers[power]) > 0:
+            print(power.capitalize() + ': ', ', '.join([signedPlanet(p,s) for p,s,d in powers[power]]))
+    print('')
+    aspects = aspect_relationships(planets)
+    for aspect in ['conjunction','opposition']:
+        if len(aspects[aspect]) > 0:
+            print(aspect.capitalize() + ': ', ', '.join([p1.capitalize() + ' ' + symbols['aspects'][aspect] + ' ' + p2.capitalize() for p1,p2,_ in aspects[aspect]]))
+    print('')
+    print('Lunar phase: {} ({})'.format(lunarPhase(birth), symbol_lookup[lunarPhase(birth)]))
+
+
+    print('')
+    print('_' * 50 + '\n')
+
+
 if __name__ == "__main__":
-    # now_cast()
     selection = input('''
 Select an option:
 1: Horoscope
